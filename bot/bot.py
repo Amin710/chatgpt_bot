@@ -139,8 +139,8 @@ async def start_handle(update: Update, context: CallbackContext):
     reply_text = "Hi! I'm <b>ChatGPT</b> bot implemented with OpenAI API 🤖\n\n"
     reply_text += HELP_MESSAGE
 
-    await update.message.reply_text(reply_text, parse_mode=ParseMode.HTML)
-    await show_chat_modes_handle(update, context)
+    # await update.message.reply_text(reply_text, parse_mode=ParseMode.HTML)
+    # await show_chat_modes_handle(update, context)
 
 
 async def help_handle(update: Update, context: CallbackContext):
@@ -625,56 +625,56 @@ def get_chat_mode_menu(page_index: int):
     return text, reply_markup
 
 
-async def show_chat_modes_handle(update: Update, context: CallbackContext):
-    await register_user_if_not_exists(update, context, update.message.from_user)
-    if await is_previous_message_not_answered_yet(update, context): return
+# async def show_chat_modes_handle(update: Update, context: CallbackContext):
+#     await register_user_if_not_exists(update, context, update.message.from_user)
+#     if await is_previous_message_not_answered_yet(update, context): return
 
-    user_id = update.message.from_user.id
-    db.set_user_attribute(user_id, "last_interaction", datetime.now())
+#     user_id = update.message.from_user.id
+#     db.set_user_attribute(user_id, "last_interaction", datetime.now())
 
-    text, reply_markup = get_chat_mode_menu(0)
-    await update.message.reply_text(text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
-
-
-async def show_chat_modes_callback_handle(update: Update, context: CallbackContext):
-     await register_user_if_not_exists(update.callback_query, context, update.callback_query.from_user)
-     if await is_previous_message_not_answered_yet(update.callback_query, context): return
-
-     user_id = update.callback_query.from_user.id
-     db.set_user_attribute(user_id, "last_interaction", datetime.now())
-
-     query = update.callback_query
-     await query.answer()
-
-     page_index = int(query.data.split("|")[1])
-     if page_index < 0:
-         return
-
-     text, reply_markup = get_chat_mode_menu(page_index)
-     try:
-         await query.edit_message_text(text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
-     except telegram.error.BadRequest as e:
-         if str(e).startswith("Message is not modified"):
-             pass
+#     text, reply_markup = get_chat_mode_menu(0)
+#     await update.message.reply_text(text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
 
 
-async def set_chat_mode_handle(update: Update, context: CallbackContext):
-    await register_user_if_not_exists(update.callback_query, context, update.callback_query.from_user)
-    user_id = update.callback_query.from_user.id
+# async def show_chat_modes_callback_handle(update: Update, context: CallbackContext):
+#      await register_user_if_not_exists(update.callback_query, context, update.callback_query.from_user)
+#      if await is_previous_message_not_answered_yet(update.callback_query, context): return
 
-    query = update.callback_query
-    await query.answer()
+#      user_id = update.callback_query.from_user.id
+#      db.set_user_attribute(user_id, "last_interaction", datetime.now())
 
-    chat_mode = query.data.split("|")[1]
+#      query = update.callback_query
+#      await query.answer()
 
-    db.set_user_attribute(user_id, "current_chat_mode", chat_mode)
-    db.start_new_dialog(user_id)
+#      page_index = int(query.data.split("|")[1])
+#      if page_index < 0:
+#          return
 
-    await context.bot.send_message(
-        update.callback_query.message.chat.id,
-        f"{config.chat_modes[chat_mode]['welcome_message']}",
-        parse_mode=ParseMode.HTML
-    )
+#      text, reply_markup = get_chat_mode_menu(page_index)
+#      try:
+#          await query.edit_message_text(text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
+#      except telegram.error.BadRequest as e:
+#          if str(e).startswith("Message is not modified"):
+#              pass
+
+
+# async def set_chat_mode_handle(update: Update, context: CallbackContext):
+#     await register_user_if_not_exists(update.callback_query, context, update.callback_query.from_user)
+#     user_id = update.callback_query.from_user.id
+
+#     query = update.callback_query
+#     await query.answer()
+
+#     chat_mode = query.data.split("|")[1]
+
+#     db.set_user_attribute(user_id, "current_chat_mode", chat_mode)
+#     db.start_new_dialog(user_id)
+
+#     await context.bot.send_message(
+#         update.callback_query.message.chat.id,
+#         f"{config.chat_modes[chat_mode]['welcome_message']}",
+#         parse_mode=ParseMode.HTML
+#     )
 
 
 def get_settings_menu(user_id: int):
@@ -856,9 +856,9 @@ def run_bot() -> None:
 
     application.add_handler(MessageHandler(filters.VOICE & user_filter, voice_message_handle))
 
-    application.add_handler(CommandHandler("mode", show_chat_modes_handle, filters=user_filter))
-    application.add_handler(CallbackQueryHandler(show_chat_modes_callback_handle, pattern="^show_chat_modes"))
-    application.add_handler(CallbackQueryHandler(set_chat_mode_handle, pattern="^set_chat_mode"))
+    # application.add_handler(CommandHandler("mode", show_chat_modes_handle, filters=user_filter))
+    # application.add_handler(CallbackQueryHandler(show_chat_modes_callback_handle, pattern="^show_chat_modes"))
+    # application.add_handler(CallbackQueryHandler(set_chat_mode_handle, pattern="^set_chat_mode"))
 
     application.add_handler(CommandHandler("settings", settings_handle, filters=user_filter))
     application.add_handler(CallbackQueryHandler(set_settings_handle, pattern="^set_settings"))
